@@ -133,6 +133,24 @@ public class DoublyLinkedList<E> {
     }
 
     /**
+     * returns the last node from this list, but not delete it.
+     *
+     * @return the last node
+     */
+    public Node<E> last() {
+        return this.last;
+    }
+
+    /**
+     * returns the first node from this list, but not delete it.
+     *
+     * @return the first node
+     */
+    public Node<E> first() {
+        return this.first;
+    }
+
+    /**
      * Moves element e to the front of list (right of the list)
      *
      * @param node moved node
