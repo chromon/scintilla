@@ -1,47 +1,59 @@
 package com.scintilla.list;
 
+import com.scintilla.cache.Entry;
+
 /**
  * Doubly-linked list node.
  *
  * @author Shukai Z
- * @param <E> the type of elements held in doubly-linked list.
  */
-public class Node<E> {
+public class Node {
 
     /**
      * Values contained in the node.
      */
-    E item;
+    private Entry<?> item;
 
     /**
      * The next node of the current node.
      */
-    Node<E> next;
+    private Node next;
 
     /**
      * The previous node of the current node.
      */
-    Node<E> prev;
+    private Node prev;
 
     /**
-     * Constructs a doubly-linked list.
+     * Constructs a doubly-linked list node with entry object.
      *
-     * @param element current node
+     * @param entry current node entry
      */
-    public Node(E element) {
-        this.item = element;
+    public Node(Entry<?> entry) {
+        this.item = entry;
     }
 
-    /**
-     * Constructs a doubly-linked list.
-     *
-     * @param prev previous node
-     * @param element current node
-     * @param next next node
-     */
-    public Node(Node<E> prev, E element, Node<E> next) {
-        this.item = element;
+    public Entry<?> getItem() {
+        return item;
+    }
+
+    public void setItem(Entry<?> item) {
+        this.item = item;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
         this.next = next;
+    }
+
+    public Node getPrev() {
+        return prev;
+    }
+
+    public void setPrev(Node prev) {
         this.prev = prev;
     }
 }

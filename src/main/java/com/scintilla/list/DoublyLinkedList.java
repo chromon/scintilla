@@ -1,14 +1,15 @@
 package com.scintilla.list;
 
+import com.scintilla.cache.Entry;
+
 import java.util.NoSuchElementException;
 
 /**
  * Doubly-Linked list.
  *
  * @author Shukai Z
- * @param <E> the type of elements held in this collection
  */
-public class DoublyLinkedList<E> {
+public class DoublyLinkedList {
 
     /**
      * Number of elements in the list.
@@ -18,12 +19,12 @@ public class DoublyLinkedList<E> {
     /**
      * Pointer to first node.
      */
-    private Node<E> first;
+    private Node first;
 
     /**
      * Pointer to last node.
      */
-    private Node<E> last;
+    private Node last;
 
     /**
      * Constructs an empty list.
@@ -31,42 +32,20 @@ public class DoublyLinkedList<E> {
     public DoublyLinkedList() {}
 
     /**
-     * Appends the specified element to the end of this list.
-     *
-     * @param e element to be appended to this list
-     * @return {@code true}
-     */
-    public boolean add(E e) {
-        final Node<E> l = this.last;
-        final Node<E> newNode = new Node<>(l, e, null);
-        this.last = newNode;
-
-        if (l == null) {
-            this.first = newNode;
-        } else {
-            l.next = newNode;
-        }
-
-        this.size++;
-
-        return true;
-    }
-
-    /**
      * Appends the specified node to the end of this list.
      *
-     * @param node node to be appended to this list
+     * @param node to be appended to this list
      * @return {@code true}
      */
-    public boolean add(Node<E> node) {
-        final Node<E> l = this.last;
-        node.prev = l;
+    public boolean add(Node node) {
+        final Node l = this.last;
+        node.setPrev(l);
         this.last = node;
 
         if (l == null) {
             this.first = node;
         } else {
-            l.next = node;
+            l.setNext(node);
         }
 
         this.size++;
@@ -80,22 +59,22 @@ public class DoublyLinkedList<E> {
      * @return the first element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeFirst() {
-        final Node<E> f = first;
+    public Entry<?> removeFirst() {
+        final Node f = first;
         if (f == null) {
             throw new NoSuchElementException();
         }
 
-        final E element = f.item;
-        final Node<E> nextNode = f.next;
-        f.item = null;
-        f.next = null;
+        final Entry<?> element = f.getItem();
+        final Node nextNode = f.getNext();
+        f.setItem(null);
+        f.setNext(null);
         this.first = nextNode;
 
         if (nextNode == null) {
             this.last = null;
         } else {
-            nextNode.prev = null;
+            nextNode.setPrev(null);
         }
 
         this.size--;
@@ -109,22 +88,22 @@ public class DoublyLinkedList<E> {
      * @return the last element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeLast() {
-        final Node<E> l = last;
+    public Entry<?> removeLast() {
+        final Node l = last;
         if (l == null) {
             throw new NoSuchElementException();
         }
 
-        final E element = l.item;
-        final Node<E> prevNode = l.prev;
-        l.item = null;
-        l.prev = null;
+        final Entry<?> element = l.getItem();
+        final Node prevNode = l.getPrev();
+        l.setItem(null);
+        l.setPrev(null);
         this.last = prevNode;
 
         if (prevNode == null) {
             this.first = null;
         } else {
-            prevNode.next = null;
+            prevNode.setNext(null);
         }
 
         this.size--;
@@ -137,7 +116,7 @@ public class DoublyLinkedList<E> {
      *
      * @return the last node
      */
-    public Node<E> last() {
+    public Node getLast() {
         return this.last;
     }
 
@@ -146,7 +125,7 @@ public class DoublyLinkedList<E> {
      *
      * @return the first node
      */
-    public Node<E> first() {
+    public Node getFirst() {
         return this.first;
     }
 
@@ -156,23 +135,23 @@ public class DoublyLinkedList<E> {
      * @param node moved node
      * @throws NoSuchElementException if this node is null
      */
-    public void moveToFront(Node<E> node) {
+    public void moveToFront(Node node) {
         if (node == null) {
             throw new NoSuchElementException();
         }
 
         if (this.last != node) {
-            if (node.prev == null) {
-                node.next.prev = null;
-                this.first = node.next;
+            if (node.getPrev() == null) {
+                node.getNext().setPrev(null);
+                this.first = node.getNext();
             } else {
-                node.prev.next = node.next;
-                node.next.prev = node.prev;
+                node.getPrev().setNext(node.getNext());
+                node.getNext().setPrev(node.getPrev());
             }
 
-            final Node<E> l = this.last;
-            l.next = node;
-            node.prev = l;
+            final Node l = this.last;
+            l.setNext(node);
+            node.setPrev(l);
             this.last = node;
         }
     }
@@ -190,15 +169,15 @@ public class DoublyLinkedList<E> {
      * Traversing the list.
      */
     public void traverse() {
-        Node<E> node = this.first;
+        Node node = this.first;
         boolean flag = false;
         while (node != null) {
             if (node == this.last) {
                 flag = true;
             }
 
-            System.out.print(node.item + " ");
-            node = node.next;
+            System.out.print(node.getItem() + " ");
+            node = node.getNext();
 
             if (flag) {
                 break;
