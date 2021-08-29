@@ -7,30 +7,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Cache is a LRU cache.
+ * LRUCache is a LRU cache.
  *
  * @author Shukai Z
  */
-public class Cache {
+public class LRUCache {
 
     /**
-     * cache is a map with address of the corresponding queue node as value.
+     * Cache is a map with address of the corresponding queue node as value.
      */
     private Map<String, Node> cache;
 
     /**
-     * queue which is implemented using a doubly liked list.
+     * Queue which is implemented using a doubly liked list.
      */
     private DoublyLinkedList queue;
 
     /**
-     * the maximum size of the queue,
+     * The maximum size of the queue,
      * it will be equal to the maximum cache size.
      */
     private long maxBytes;
 
     /**
-     * the cache size already used
+     * The cache size already used
      */
     private long nBytes;
 
@@ -39,14 +39,14 @@ public class Cache {
      *
      * @param maxBytes the maximum size of the cache
      */
-    public Cache(long maxBytes) {
+    public LRUCache(long maxBytes) {
         this.cache = new HashMap<>();
         this.queue = new DoublyLinkedList();
         this.maxBytes = maxBytes;
     }
 
     /**
-     * get look ups a key's value.
+     * Get look ups a key's value from the cache.
      *
      * @param key cache key.
      * @return the cache value.
@@ -63,7 +63,8 @@ public class Cache {
     }
 
     /**
-     * removes the oldest element from cache (and delete the last node in queue).
+     * Removes the oldest element from cache
+     * (and delete the last node in queue).
      */
     public void remove() {
         Node first = this.queue.getFirst();
@@ -79,7 +80,7 @@ public class Cache {
     }
 
     /**
-     * add a value to the cache, if the key exists, update it.
+     * Adds a value to the cache, if the key exists, update it.
      *
      * @param key cache key.
      * @param value cache value.
@@ -106,7 +107,7 @@ public class Cache {
     }
 
     /**
-     * length the number of cache entries
+     * Length the number of cache entries
      *
      * @return cache entries count
      */

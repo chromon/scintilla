@@ -4,13 +4,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CacheTest {
+public class LRUCacheTest {
 
-    private Cache cache;
+    private LRUCache cache;
 
     @Before
     public void init() {
-        cache = new Cache(24);
+        cache = new LRUCache(24);
         cache.add("123", 123);
         cache.add("s1", "abc");
         cache.add("bool", true);
