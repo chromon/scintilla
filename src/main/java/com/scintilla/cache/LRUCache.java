@@ -35,14 +35,33 @@ public class LRUCache {
     private long nBytes;
 
     /**
+     * Optional and executed when an entry is purged.
+     */
+    private Callback callback;
+
+    /**
      * Constructs a cache with maximum size.
      *
-     * @param maxBytes the maximum size of the cache
+     * @param maxBytes the maximum size of the cache.
      */
     public LRUCache(long maxBytes) {
         this.cache = new HashMap<>();
         this.queue = new DoublyLinkedList();
         this.maxBytes = maxBytes;
+    }
+
+    /**
+     * Constructs a cache with maximum size and callback func.
+     *
+     * @param maxBytes the maximum size of the cache.
+     * @param callback callback interface.
+     * @param <T> generic type.
+     */
+    public <T> LRUCache(long maxBytes, Callback callback) {
+        this.cache = new HashMap<>();
+        this.queue = new DoublyLinkedList();
+        this.maxBytes = maxBytes;
+        this.callback = callback;
     }
 
     /**
@@ -76,6 +95,11 @@ public class LRUCache {
             this.queue.removeFirst();
 
             this.nBytes -= entry.getKey().length() + entry.getValueLength();
+
+            // If the callback func not null, invoke the process method.
+            if (this.callback != null) {
+                this.callback.process(entry.getKey(), entry.getValue());
+            }
         }
     }
 
