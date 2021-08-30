@@ -1,5 +1,6 @@
 package com.scintilla.cache;
 
+import com.scintilla.cache.callback.Callback;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

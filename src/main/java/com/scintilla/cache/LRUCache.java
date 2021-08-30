@@ -1,5 +1,6 @@
 package com.scintilla.cache;
 
+import com.scintilla.cache.callback.Callback;
 import com.scintilla.list.DoublyLinkedList;
 import com.scintilla.list.Node;
 

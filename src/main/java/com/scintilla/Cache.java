@@ -5,7 +5,7 @@ import com.scintilla.view.ByteView;
 
 /**
  * The LRUCache encapsulated Classes,
- * it's the external access interface.
+ * it's the external access interface, and implements concurrency features.
  */
 public class Cache {
 
@@ -20,8 +20,17 @@ public class Cache {
     private long cacheBytes;
 
     /**
+     * Constructs a Cache object with cacheBytes.
+     *
+     * @param cacheBytes The maximum size of the cache.
+     */
+    public Cache(long cacheBytes) {
+        this.cacheBytes = cacheBytes;
+    }
+
+    /**
      * Add a value to the cache,
-     * and adding concurrency features
+     * and adding concurrency features.
      *
      * @param key cache key.
      * @param value cache value.

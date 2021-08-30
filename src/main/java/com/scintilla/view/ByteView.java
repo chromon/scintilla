@@ -36,11 +36,29 @@ public class ByteView {
     }
 
     /**
+     * Returns a copy of the data.
+     *
+     * @param by data.
+     * @return copy of the data.
+     */
+    public byte[] cloneBytes(byte[] by) {
+        return by.clone();
+    }
+
+    /**
      * Returns the data as a string, making a copy if necessary.
      * @return the data as a string
      */
     @Override
     public String toString() {
         return new String(b);
+    }
+
+    public byte[] getB() {
+        return b;
+    }
+
+    public void setB(byte[] b) {
+        this.b = b;
     }
 }
