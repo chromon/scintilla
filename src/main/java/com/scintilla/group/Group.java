@@ -58,7 +58,7 @@ public class Group {
 
         if (key.equals("")) {
             logger.log(Level.WARNING, "key is required.");
-            return new ByteView();
+            return null;
         }
 
         // Get cache data from Cache, if exists return the data.
@@ -89,7 +89,7 @@ public class Group {
         // Get the source data, customized by the user.
         byte[] bytes = this.getter.get(key);
         if (bytes == null) {
-            return new ByteView();
+            return null;
         }
 
         // Encapsulated Data for ByteView.
