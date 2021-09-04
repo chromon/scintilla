@@ -115,7 +115,7 @@ public class HTTPPool implements HttpHandler {
 
     /**
      * Output back client.
-     * 
+     *
      * @param exchange HttpExchange.
      * @param response Response message.
      * @throws IOException IO exception.
