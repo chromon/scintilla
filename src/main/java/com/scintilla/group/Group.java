@@ -1,7 +1,9 @@
 package com.scintilla.group;
 
-import com.scintilla.Cache;
-import com.scintilla.getter.Getter;
+import com.scintilla.cache.Cache;
+import com.scintilla.getter.SourceDataGetter;
+import com.scintilla.http.PeerGetter;
+import com.scintilla.http.PeerPicker;
 import com.scintilla.view.ByteView;
 
 import java.util.logging.Level;
@@ -20,7 +22,7 @@ public class Group {
     /**
      * Callback interface for getting source data when the cache is not hit.
      */
-    private Getter getter;
+    private SourceDataGetter sourceDataGetter;
 
     /**
      * Cache with concurrency features.
@@ -28,23 +30,41 @@ public class Group {
     private Cache cache;
 
     /**
+     * Inject the HTTPPool that implements the PeerPicker interface into the Group.
+     */
+    private PeerPicker peerPicker;
+
+    /**
      * Constructs a Group and put it in Groups map.
      *
      * @param name Group name.
      * @param cacheBytes Cache size.
-     * @param getter Getter callback func.
+     * @param sourceDataGetter Getter callback func.
      * @param groups Group collection.
      */
-    public Group(String name, long cacheBytes, Groups groups, Getter getter) {
-        if (getter == null) {
+    public Group(String name, long cacheBytes, Groups groups, SourceDataGetter sourceDataGetter) {
+        if (sourceDataGetter == null) {
             throw new RuntimeException("Getter is null.");
         }
 
         this.name = name;
         this.cache = new Cache(cacheBytes);
-        this.getter = getter;
+        this.sourceDataGetter = sourceDataGetter;
 
         groups.getGroups().put(name, this);
+    }
+
+    /**
+     * Registers a PeerPicker for choosing remote peer.
+     * Injects the HTTPPool that implements the PeerPicker interface into the Group.
+     *
+     * @param peerPicker The HTTPPool that implements the PeerPicker.
+     */
+    public void registerPeers(PeerPicker peerPicker) {
+        if (this.peerPicker != null) {
+            throw new RuntimeException("Register PeerPicker called more than once.");
+        }
+        this.peerPicker = peerPicker;
     }
 
     /**
@@ -64,7 +84,8 @@ public class Group {
         // Get cache data from Cache, if exists return the data.
         ByteView byteView = this.cache.get(key);
         if (byteView != null) {
-            logger.log(Level.INFO, "[Cache] hit");
+            logger.log(Level.INFO,
+                    "[Cache] hit, {key: " + key + ", value: " + byteView.toString() + "}");
             return byteView;
         }
 
@@ -74,9 +95,43 @@ public class Group {
 
     /**
      * Loads key either by invoking the getter locally or by sending it to another machine.
+     * Use the PickPeer() method to select the node and call getFromPeer()
+     * to get it from the remote if it is not a native node.
+     * If it is a native node or fails, fall back to getLocally().
      */
     public ByteView load(String key) {
+
+        if (this.peerPicker != null) {
+            PeerGetter peerGetter = this.peerPicker.pickPeer(key);
+            if (peerGetter != null) {
+                ByteView value = this.getFromPeer(peerGetter, key);
+                if (value != null) {
+                    return value;
+                }
+                System.err.println("[Cache] Failed to get from peer.");
+            }
+        }
+
         return this.getLocally(key);
+    }
+
+    /**
+     * Use an httpGetter that implements the PeerGetter interface
+     * to get cached values from accessing remote nodes.
+     *
+     * @param peerGetter an httpGetter that implements the PeerGetter interface .
+     * @param key Cache key.
+     * @return Cache value.
+     */
+    public ByteView getFromPeer(PeerGetter peerGetter, String key) {
+        byte[] bytes = peerGetter.get(this.name, key);
+        if (bytes.length == 0) {
+            return null;
+        }
+
+        ByteView b = new ByteView();
+        b.setB(bytes);
+        return b;
     }
 
     /**
@@ -87,7 +142,7 @@ public class Group {
      */
     private ByteView getLocally(String key) {
         // Get the source data, customized by the user.
-        byte[] bytes = this.getter.get(key);
+        byte[] bytes = this.sourceDataGetter.getSourceData(key);
         if (bytes == null) {
             return null;
         }

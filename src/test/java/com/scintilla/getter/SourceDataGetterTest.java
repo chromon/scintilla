@@ -5,16 +5,16 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class GetterTest {
+public class SourceDataGetterTest {
 
     @Test
     public void testGet() {
-        Assert.assertEquals(true, Arrays.equals("abc".getBytes(), new Getter() {
+        Assert.assertEquals(true, Arrays.equals("abc".getBytes(), new SourceDataGetter() {
             @Override
-            public byte[] get(String key) {
+            public byte[] getSourceData(String key) {
                 return key.getBytes();
             }
-        }.get("abc")));
+        }.getSourceData("abc")));
 
     }
 }

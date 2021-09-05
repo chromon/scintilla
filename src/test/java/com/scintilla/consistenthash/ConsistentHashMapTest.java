@@ -1,6 +1,7 @@
 package com.scintilla.consistenthash;
 
 import com.scintilla.consistenthash.hash.Hash;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -33,8 +34,12 @@ public class ConsistentHashMapTest {
             }
         });
 
+        // 2, 4, 6, 12, 14, 16, 22, 24,26
+        // real nodes: 2, 4, 6
+        // virtual nodes: 12, 14, 16, 22, 24,26
         hashMap.add("6", "4", "2");
 
+        // key: cache key, value: real nodes
         Map<String, String> testCase = new HashMap<>();
         testCase.put("2", "2");
         testCase.put("11", "2");
@@ -42,10 +47,7 @@ public class ConsistentHashMapTest {
         testCase.put("27", "2");
 
         for (Map.Entry<String, String> entry : testCase.entrySet()) {
-            if (!hashMap.get(entry.getKey()).equals(entry.getValue())) {
-                System.err.println("asking for " + entry.getKey()
-                        + ", should have yielded " + entry.getValue());
-            }
+            Assert.assertEquals(entry.getValue(), hashMap.get(entry.getKey()));
         }
 
         hashMap.add("8");
@@ -53,10 +55,7 @@ public class ConsistentHashMapTest {
         testCase.put("27", "8");
 
         for (Map.Entry<String, String> entry : testCase.entrySet()) {
-            if (!hashMap.get(entry.getKey()).equals(entry.getValue())) {
-                System.err.println("asking for " + entry.getKey()
-                        + ", should have yielded " + entry.getValue());
-            }
+            Assert.assertEquals(entry.getValue(), hashMap.get(entry.getKey()));
         }
     }
 }

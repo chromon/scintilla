@@ -1,9 +1,8 @@
 package com.scintilla.http;
 
-import com.scintilla.getter.Getter;
+import com.scintilla.getter.SourceDataGetter;
 import com.scintilla.group.Group;
 import com.scintilla.group.Groups;
-import com.scintilla.http.HTTPPool;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.Test;
 
@@ -23,9 +22,9 @@ public class HTTPPoolTest {
 
         Groups groups = new Groups();
 
-        new Group("scores", 2 << 10, groups, new Getter() {
+        new Group("scores", 2 << 10, groups, new SourceDataGetter() {
             @Override
-            public byte[] get(String key) {
+            public byte[] getSourceData(String key) {
                 System.out.println("[SlowDB] search key:" + key);
                 if (db.get(key) != null) {
                     return db.get(key).getBytes();

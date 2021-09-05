@@ -1,4 +1,4 @@
-package com.scintilla;
+package com.scintilla.cache;
 
 import com.scintilla.cache.LRUCache;
 import com.scintilla.view.ByteView;

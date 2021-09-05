@@ -1,8 +1,6 @@
-package com.scintilla;
+package com.scintilla.group;
 
-import com.scintilla.getter.Getter;
-import com.scintilla.group.Group;
-import com.scintilla.group.Groups;
+import com.scintilla.getter.SourceDataGetter;
 import com.scintilla.view.ByteView;
 import org.junit.Test;
 
@@ -20,9 +18,9 @@ public class GroupTest {
         Map<String, Integer> loadCounts = new HashMap<>();
         Groups groups = new Groups();
 
-        Group scores = new Group("scores", 2 << 10, groups, new Getter() {
+        Group scores = new Group("scores", 2 << 10, groups, new SourceDataGetter() {
             @Override
-            public byte[] get(String key) {
+            public byte[] getSourceData(String key) {
                 System.out.println("[SlowDB] search key:" + key);
                 String s = db.get(key);
                 if (s != null) {

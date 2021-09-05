@@ -1,16 +1,14 @@
 package com.scintilla.http;
 
-import com.scintilla.getter.Getter;
+import com.scintilla.consistenthash.ConsistentHashMap;
 import com.scintilla.group.Group;
 import com.scintilla.group.Groups;
 import com.scintilla.view.ByteView;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,7 +18,7 @@ import java.util.logging.Logger;
  * The core data structure for HTTP communication between nodes,
  * include server and client.
  */
-public class HTTPPool implements HttpHandler {
+public class HTTPPool implements HttpHandler, PeerPicker {
 
     /**
      * this peer's base URL, e.g. "https://example.net:8080"
@@ -32,7 +30,27 @@ public class HTTPPool implements HttpHandler {
      */
     private String basePath = "/_cache/";
 
+    /**
+     * Cache groups.
+     */
     private Groups groups;
+
+    /**
+     * Consistent hash map to select a node based on a specific key.
+     */
+    private ConsistentHashMap peersConsistentMap;
+
+    /**
+     * Mapping remote nodes to httpGetters.
+     * Each remote node corresponds to an httpGetter.
+     * HttpGetter is related to the address baseURL of the remote node.
+     */
+    private Map<String, HTTPGetter> httpGetterMap;
+
+    /**
+     * Default virtual node multiples.
+     */
+    private static final int defaultReplicas = 50;
 
     /**
      * Constructs HTTPPool with base URL.
@@ -67,6 +85,42 @@ public class HTTPPool implements HttpHandler {
         String msg = String.format("[Cache Server %s] %s",
                 this.baseURL, String.format(format, obj));
         logger.log(Level.INFO, msg);
+    }
+
+    /**
+     * Instantiates the consistency hashing map
+     * and adds the nodes.
+     * Create an HTTP client (HTTPGetter) for each node.
+     *
+     * @param peers nodes.
+     */
+    public synchronized void setPeersConsistentMap(String... peers) {
+        this.peersConsistentMap = new ConsistentHashMap(defaultReplicas, null);
+        this.peersConsistentMap.add(peers);
+        this.httpGetterMap = new HashMap<>();
+
+        // Create http client for each node.
+        for (String peer : peers) {
+            // http://example.com/_cache/
+            this.httpGetterMap.put(peer, new HTTPGetter(peer + this.basePath));
+        }
+    }
+
+    /**
+     * Picks a peer according to key.
+     *
+     * @param key Cache key.
+     * @return The HTTP client corresponding to the node.
+     */
+    @Override
+    public synchronized PeerGetter pickPeer(String key) {
+        // node key
+        String peer = this.peersConsistentMap.get(key);
+        if (!peer.equals("") && !peer.equals(this.baseURL)) {
+            this.log("Pick peer %s", peer);
+            return this.httpGetterMap.get(peer);
+        }
+        return null;
     }
 
     /**
