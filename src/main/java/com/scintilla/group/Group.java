@@ -4,6 +4,8 @@ import com.scintilla.cache.Cache;
 import com.scintilla.getter.SourceDataGetter;
 import com.scintilla.http.PeerGetter;
 import com.scintilla.http.PeerPicker;
+import com.scintilla.singleflight.Request;
+import com.scintilla.singleflight.WaitGroup;
 import com.scintilla.view.ByteView;
 
 import java.util.logging.Level;
@@ -35,6 +37,11 @@ public class Group {
     private PeerPicker peerPicker;
 
     /**
+     * use WaitGroup to make sure that each key is only fetched once.
+     */
+    private WaitGroup waitGroup;
+
+    /**
      * Constructs a Group and put it in Groups map.
      *
      * @param name Group name.
@@ -50,6 +57,7 @@ public class Group {
         this.name = name;
         this.cache = new Cache(cacheBytes);
         this.sourceDataGetter = sourceDataGetter;
+        this.waitGroup = new WaitGroup();
 
         groups.getGroups().put(name, this);
     }
@@ -101,18 +109,27 @@ public class Group {
      */
     public ByteView load(String key) {
 
-        if (this.peerPicker != null) {
-            PeerGetter peerGetter = this.peerPicker.pickPeer(key);
-            if (peerGetter != null) {
-                ByteView value = this.getFromPeer(peerGetter, key);
-                if (value != null) {
-                    return value;
+        // each key is only fetched once (either locally or remotely)
+        // regardless of the number of concurrent callers.
+        Object obj = this.waitGroup.requestWait(key, new Request() {
+            @Override
+            public Object sendRequest() {
+                if (peerPicker != null) {
+                    PeerGetter peerGetter = peerPicker.pickPeer(key);
+                    if (peerGetter != null) {
+                        ByteView value = getFromPeer(peerGetter, key);
+                        if (value != null) {
+                            return value;
+                        }
+                        System.err.println("[Cache] Failed to get from peer.");
+                    }
                 }
-                System.err.println("[Cache] Failed to get from peer.");
-            }
-        }
 
-        return this.getLocally(key);
+                return getLocally(key);
+            }
+        });
+
+        return (ByteView) obj;
     }
 
     /**

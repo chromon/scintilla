@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CacheTest {
+public class Demo {
 
     private static Map<String, String> db = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class CacheTest {
         db.put("c", "c3");
         db.put("234848549", "i4");
 
-        int port = 8001;
+        int port = 8003;
 
         Map<Integer, String> addrMap = new HashMap<>();
         addrMap.put(8001, "http://localhost:8001");
@@ -91,7 +91,7 @@ public class CacheTest {
 
         HttpServer server = HttpServer.create(addr,0);
         server.createContext("/_cache/", peers);
-        System.out.println("cache is running at :" + addr.getHostName() + ":" +addr.getPort());
+        System.out.println("cache is running at: " + addr.getHostName() + ":" +addr.getPort());
         server.start();
     }
 
@@ -101,7 +101,7 @@ public class CacheTest {
 
         HttpServer server = HttpServer.create(addr,0);
         server.createContext("/api", peers);
-        System.out.println("api is running at :" + addr.getHostName() + ":" +addr.getPort());
+        System.out.println("api is running at: " + addr.getHostName() + ":" +addr.getPort());
         server.start();
     }
 }
