@@ -60,6 +60,7 @@ public class HTTPPool implements HttpHandler, PeerPicker {
      * Constructs HTTPPool with base URL.
      *
      * @param baseURL This peer's base URL.
+     * @param groups Cache groups.
      */
     public HTTPPool(String baseURL, Groups groups) {
         this.baseURL = baseURL;
@@ -71,6 +72,7 @@ public class HTTPPool implements HttpHandler, PeerPicker {
      *
      * @param baseURL This peer's base URL.
      * @param basePath This peer's base path.
+     * @param groups Cache groups.
      */
     public HTTPPool(String baseURL, String basePath, Groups groups) {
         this.baseURL = baseURL;

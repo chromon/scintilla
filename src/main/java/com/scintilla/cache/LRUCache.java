@@ -69,6 +69,7 @@ public class LRUCache {
      * Get look ups a key's value from the cache.
      *
      * @param key cache key.
+     * @param <T> generic type.
      * @return the cache value.
      */
     public <T> T get(String key) {
@@ -108,6 +109,7 @@ public class LRUCache {
      * Adds a value to the cache, if the key exists, update it.
      *
      * @param key cache key.
+     * @param <T> generic type.
      * @param value cache value.
      */
     public <T> void add(String key, T value) {

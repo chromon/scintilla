@@ -38,6 +38,7 @@ public class Entry<T> {
 
     /**
      * convert object to json string and get the string length.
+     * @return object length.
      */
     public long calValueLength() {
         ObjectMapper objectMapper = new ObjectMapper();

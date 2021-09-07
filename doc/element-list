@@ -1,0 +1,12 @@
+com.scintilla
+com.scintilla.cache
+com.scintilla.cache.callback
+com.scintilla.cachepb
+com.scintilla.consistenthash
+com.scintilla.consistenthash.hash
+com.scintilla.getter
+com.scintilla.group
+com.scintilla.http
+com.scintilla.list
+com.scintilla.singleflight
+com.scintilla.view

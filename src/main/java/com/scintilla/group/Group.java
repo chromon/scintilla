@@ -107,6 +107,9 @@ public class Group {
      * Use the PickPeer() method to select the node and call getFromPeer()
      * to get it from the remote if it is not a native node.
      * If it is a native node or fails, fall back to getLocally().
+     *
+     * @param key cache key.
+     * @return ByteView byte view.
      */
     public ByteView load(String key) {
 
