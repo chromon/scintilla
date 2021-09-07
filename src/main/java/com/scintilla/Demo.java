@@ -28,7 +28,7 @@ public class Demo {
         db.put("c", "c3");
         db.put("234848549", "i4");
 
-        int port = 8003;
+        int port = 8002;
 
         Map<Integer, String> addrMap = new HashMap<>();
         addrMap.put(8001, "http://localhost:8001");

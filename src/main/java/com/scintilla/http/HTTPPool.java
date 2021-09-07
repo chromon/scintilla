@@ -1,5 +1,7 @@
 package com.scintilla.http;
 
+import com.google.protobuf.ByteString;
+import com.scintilla.cachepb.Cachepb;
 import com.scintilla.consistenthash.ConsistentHashMap;
 import com.scintilla.group.Group;
 import com.scintilla.group.Groups;
@@ -9,6 +11,8 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -131,7 +135,6 @@ public class HTTPPool implements HttpHandler, PeerPicker {
      */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
         String path = exchange.getRequestURI().getPath();
 
         if (!path.startsWith(this.basePath)) {
@@ -162,7 +165,16 @@ public class HTTPPool implements HttpHandler, PeerPicker {
                 this.write(exchange, "500 - Status Internal Server Error.");
             } else {
                 exchange.sendResponseHeaders(200, 0);
-                this.write(exchange, new String(byteView.byteSlice()));
+
+                Cachepb.Response.Builder respBuilder = Cachepb.Response.newBuilder();
+                byte[] bytes = byteView.byteSlice();
+
+                respBuilder.setValue(ByteString.copyFrom(bytes));
+                Cachepb.Response response = respBuilder.build();
+
+                // Protobuf transferred via http need encode base64 code.
+                Base64.Encoder encoder = Base64.getEncoder();
+                this.write(exchange, encoder.encodeToString(response.toByteArray()));
             }
         }
     }
@@ -177,6 +189,19 @@ public class HTTPPool implements HttpHandler, PeerPicker {
     public void write(HttpExchange exchange, String response) throws IOException {
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
+        os.close();
+    }
+
+    /**
+     * output back client with protobuf.
+     *
+     * @param exchange  HttpExchange.
+     * @param response  Response message.
+     * @throws IOException  IO exception.
+     */
+    public void write(HttpExchange exchange, byte[] response) throws IOException {
+        OutputStream os = exchange.getResponseBody();
+        os.write(response);
         os.close();
     }
 }

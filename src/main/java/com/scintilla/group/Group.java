@@ -1,6 +1,7 @@
 package com.scintilla.group;
 
 import com.scintilla.cache.Cache;
+import com.scintilla.cachepb.Cachepb;
 import com.scintilla.getter.SourceDataGetter;
 import com.scintilla.http.PeerGetter;
 import com.scintilla.http.PeerPicker;
@@ -124,11 +125,9 @@ public class Group {
                         System.err.println("[Cache] Failed to get from peer.");
                     }
                 }
-
                 return getLocally(key);
             }
         });
-
         return (ByteView) obj;
     }
 
@@ -141,7 +140,17 @@ public class Group {
      * @return Cache value.
      */
     public ByteView getFromPeer(PeerGetter peerGetter, String key) {
-        byte[] bytes = peerGetter.get(this.name, key);
+
+        // Request.
+        Cachepb.Request.Builder reqBuilder = Cachepb.Request.newBuilder();
+        reqBuilder.setGroup(this.name);
+        reqBuilder.setKey(key);
+        Cachepb.Request request = reqBuilder.build();
+
+        // Response.
+        Cachepb.Response response = peerGetter.get(request);
+
+        byte[] bytes = response.getValue().toByteArray();
         if (bytes.length == 0) {
             return null;
         }

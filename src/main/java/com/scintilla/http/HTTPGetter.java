@@ -1,9 +1,14 @@
 package com.scintilla.http;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.scintilla.cachepb.Cachepb;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +53,39 @@ public class HTTPGetter implements PeerGetter {
             return resp.getBytes();
         }
         return new byte[0];
+    }
+
+    /**
+     * Find cached values from the group with protobuf.
+     *
+     * @param in request.
+     */
+    @Override
+    public Cachepb.Response get(Cachepb.Request in) {
+        // url e.g. http://example.com/_cache/groupname/key
+        String url = this.baseURL +
+                in.getGroup() + "/" +
+                in.getKey();
+
+        // send request and get message from server.
+        String resp = this.sendGetRequest(url);
+
+        Cachepb.Response response = null;
+
+        if (resp != null) {
+            byte[] bytes = resp.getBytes();
+
+            // Protobuf transferred via http need encode base64 code.
+            // Decode base64 code.
+            Base64.Decoder decoder = Base64.getDecoder();
+
+            try {
+                response = Cachepb.Response.parseFrom(decoder.decode(bytes));
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            }
+        }
+        return response;
     }
 
     /**
@@ -100,7 +138,6 @@ public class HTTPGetter implements PeerGetter {
                 e2.printStackTrace();
             }
         }
-
         return result.toString();
     }
 }
